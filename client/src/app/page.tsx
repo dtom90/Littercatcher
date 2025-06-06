@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import Link from 'next/link';
 
 // Define the Dataset type based on expected API response
 interface Dataset {
@@ -27,9 +28,9 @@ export default function Home() {
       {data?.datasets && (
         <ul className="mt-4 space-y-2">
           {data.datasets.map((dataset) => (
-            <li key={dataset.id} className="p-4 bg-gray-800 text-white rounded">
-              {dataset.name}
-            </li>
+            <Link key={dataset.id} href={`/datasets/${dataset.id}`} className="p-4 bg-gray-800 text-white rounded block hover:bg-gray-700">
+              <span>{dataset.name}</span>
+            </Link>
           ))}
         </ul>
       )}
