@@ -28,7 +28,7 @@ export default function DatasetPage() {
   const { data: dataset, isLoading, error } = useQuery<Dataset>({
     queryKey: ['dataset', datasetId],
     queryFn: async () => {
-      const res = await fetch(`http://localhost:8000/datasets/${datasetId}`);
+      const res = await fetch(`/api/datasets/${datasetId}`);
       if (!res.ok) throw new Error('Network response was not ok');
       return res.json();
     },
@@ -119,7 +119,7 @@ export default function DatasetPage() {
           )}
         </div>
 
-        <DatasetImages datasetId={Number(datasetId)} datasetName={dataset.name} split={split} />
+        <DatasetImages datasetId={Number(datasetId)} split={split} />
       </div>
     </div>
   );

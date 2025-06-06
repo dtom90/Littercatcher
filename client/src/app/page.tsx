@@ -14,7 +14,7 @@ export default function Home() {
   const { data, isLoading, error } = useQuery<{ datasets: Dataset[] }>({
     queryKey: ['datasets'],
     queryFn: async () => {
-      const res = await fetch('http://localhost:8000/datasets');
+      const res = await fetch('/api/datasets');
       if (!res.ok) throw new Error('Network response was not ok');
       return res.json();
     },

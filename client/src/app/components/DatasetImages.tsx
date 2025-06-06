@@ -8,7 +8,6 @@ import Pagination from './Pagination';
 
 interface DatasetImagesProps {
   datasetId: number;
-  datasetName: string;
   split: DatasetSplitType;
 }
 
@@ -16,7 +15,7 @@ const PAGE_SIZE = 5;
 
 const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page: number) => {
   const response = await fetch(
-    `http://localhost:8000/datasets/${datasetId}/images?split=${split}&page=${page}&page_size=${PAGE_SIZE}`
+    `/api/datasets/${datasetId}/images?split=${split}&page=${page}&page_size=${PAGE_SIZE}`
   );
   
   if (!response.ok) {
@@ -26,7 +25,7 @@ const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page:
   return response.json() as Promise<ImagesResponse>;
 };
 
-const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) => {
+const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
   const [page, setPage] = useState(1);
   const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
 
@@ -61,7 +60,7 @@ const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) =>
                 <button key={image.filename} className="w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer" onClick={() => setSelectedImage(image)}>
                   <div className="relative w-12 h-12 mr-2">
                     <Image
-                      src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(image.filename)}`}
+                      src={image.path}
                       alt={image.filename}
                       fill
                       sizes="12px"
@@ -76,7 +75,7 @@ const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) =>
               {selectedImage ?
                 <div className="relative w-full h-[400px]">
                   <Image
-                    src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(selectedImage.filename)}`}
+                    src={selectedImage.path}
                     alt={selectedImage.filename}
                     fill
                     sizes="100%"

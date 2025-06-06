@@ -1,0 +1,9 @@
+datasets:
+  - id: 0
+    name: "Litter Dataset v1"
+    directory: "Litter Dataset.v1i.coco-mmdetection"
+    source: "https://universe.roboflow.com/sushiteam/litter-dataset-fxyqc"
+  - id: 1
+    name: "Litter Dataset v2"
+    directory: "Litter Dataset.v2i.coco-mmdetection"
+    source: "https://universe.roboflow.com/sushiteam/litter-dataset-fxyqc"
