@@ -40,3 +40,6 @@ dmypy.json
 
 # pytest
 .pytest_cache/
+
+# System
+.DS_Store
