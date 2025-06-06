@@ -2,6 +2,29 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+from typing import Dict, List, Optional
+from pydantic import BaseModel
+
+class SplitCounts(BaseModel):
+    train: int
+    valid: int
+    test: int
+
+class DatasetResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    imageCount: int
+    splitCounts: SplitCounts
+    createdAt: Optional[str]
+    updatedAt: Optional[str]
+
+class DatasetListItem(BaseModel):
+    id: int
+    name: str
+
+class DatasetsResponse(BaseModel):
+    datasets: List[DatasetListItem]
 
 app = FastAPI(
     title="Slobcatcher API",
@@ -26,8 +49,8 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
-@app.get("/datasets")
-async def get_datasets() -> dict[str, list[dict[str, str | int]]]:
+@app.get("/datasets", response_model=DatasetsResponse)
+async def get_datasets():
     datasets_dir = os.path.join(os.path.dirname(__file__), "..", "datasets")
     if not os.path.exists(datasets_dir):
         return {"datasets": []}
@@ -38,8 +61,8 @@ async def get_datasets() -> dict[str, list[dict[str, str | int]]]:
     datasets = [{"id": idx, "name": name} for idx, name in enumerate(dataset_names)]
     return {"datasets": datasets}
 
-@app.get("/datasets/{dataset_id}")
-async def get_dataset(dataset_id: int) -> dict[str, str | int]:
+@app.get("/datasets/{dataset_id}", response_model=DatasetResponse)
+async def get_dataset(dataset_id: int):
     datasets_dir = os.path.join(os.path.dirname(__file__), "..", "datasets")
     if not os.path.exists(datasets_dir):
         raise HTTPException(status_code=404, detail="Datasets directory not found")
@@ -69,11 +92,14 @@ async def get_dataset(dataset_id: int) -> dict[str, str | int]:
                 break
     
     # Count images in train, valid, and test directories
+    split_counts = {'train': 0, 'valid': 0, 'test': 0}
     for split in ['train', 'valid', 'test']:
         split_path = os.path.join(dataset_path, split)
         if os.path.exists(split_path):
-            image_count += len([f for f in os.listdir(split_path) 
-                              if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+            count = len([f for f in os.listdir(split_path) 
+                        if f.lower().endswith(('.png', '.jpg', '.jpeg'))])
+            split_counts[split] = count
+            image_count += count
     
     # Get creation and update times
     if os.path.exists(dataset_path):
@@ -85,6 +111,7 @@ async def get_dataset(dataset_id: int) -> dict[str, str | int]:
         "name": dataset_name,
         "description": description,
         "imageCount": image_count,
+        "splitCounts": split_counts,
         "createdAt": created_at,
         "updatedAt": updated_at
     }

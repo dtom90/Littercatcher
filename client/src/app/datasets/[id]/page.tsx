@@ -10,6 +10,11 @@ interface Dataset {
   name: string;
   description?: string;
   imageCount?: number;
+  splitCounts?: {
+    train: number;
+    valid: number;
+    test: number;
+  };
   createdAt?: string;
   updatedAt?: string;
 }
@@ -61,7 +66,24 @@ export default function DatasetPage() {
           {dataset?.imageCount !== undefined && (
             <div>
               <h2 className="text-xl font-semibold mb-2">Images</h2>
-              <p className="text-gray-300">{dataset.imageCount} images</p>
+              <p className="text-gray-300 mb-4">{dataset.imageCount} total images</p>
+              
+              {dataset.splitCounts && (
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-200">Training</h3>
+                    <p className="text-2xl font-bold text-blue-400">{dataset.splitCounts.train}</p>
+                  </div>
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-200">Validation</h3>
+                    <p className="text-2xl font-bold text-yellow-400">{dataset.splitCounts.valid}</p>
+                  </div>
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h3 className="font-medium text-gray-200">Testing</h3>
+                    <p className="text-2xl font-bold text-green-400">{dataset.splitCounts.test}</p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
