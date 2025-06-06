@@ -16,8 +16,6 @@ class DatasetResponse(BaseModel):
     description: str
     imageCount: int
     splitCounts: SplitCounts
-    createdAt: Optional[str]
-    updatedAt: Optional[str]
 
 class DatasetListItem(BaseModel):
     id: int
@@ -79,8 +77,6 @@ async def get_dataset(dataset_id: int):
     # Get dataset metadata
     description = ""
     image_count = 0
-    created_at = None
-    updated_at = None
     
     # Try to read README files for description
     readme_files = ["README.dataset.txt", "README.roboflow.txt"]
@@ -101,17 +97,10 @@ async def get_dataset(dataset_id: int):
             split_counts[split] = count
             image_count += count
     
-    # Get creation and update times
-    if os.path.exists(dataset_path):
-        created_at = datetime.fromtimestamp(os.path.getctime(dataset_path)).isoformat()
-        updated_at = datetime.fromtimestamp(os.path.getmtime(dataset_path)).isoformat()
-    
     return {
         "id": dataset_id,
         "name": dataset_name,
         "description": description,
         "imageCount": image_count,
         "splitCounts": split_counts,
-        "createdAt": created_at,
-        "updatedAt": updated_at
     }

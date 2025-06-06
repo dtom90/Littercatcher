@@ -15,8 +15,6 @@ interface Dataset {
     valid: number;
     test: number;
   };
-  createdAt?: string;
-  updatedAt?: string;
 }
 
 export default function DatasetPage() {
@@ -84,20 +82,6 @@ export default function DatasetPage() {
                   </div>
                 </div>
               )}
-            </div>
-          )}
-          
-          {dataset?.createdAt && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Created</h2>
-              <p className="text-gray-300">{new Date(dataset.createdAt).toLocaleDateString()}</p>
-            </div>
-          )}
-          
-          {dataset?.updatedAt && (
-            <div>
-              <h2 className="text-xl font-semibold mb-2">Last Updated</h2>
-              <p className="text-gray-300">{new Date(dataset.updatedAt).toLocaleDateString()}</p>
             </div>
           )}
         </div>
