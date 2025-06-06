@@ -44,58 +44,60 @@ const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
     setSelectedImage(null);
   };
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   if (error) {
     return <div className="p-4 text-red-500">{error instanceof Error ? error.message : 'An error occurred'}</div>;
   }
 
+  if (!data) {
+    return <div>No data</div>;
+  }
+
   return (
     <div className="p-4">
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <div className="flex items-center">
-            <div className="flex-1 space-y-4 mr-4">
-              {data?.images.map((image) => (
-                <button key={image.filename} className="w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer" onClick={() => setSelectedImage(image)}>
-                  <div className="relative w-12 h-12 mr-2">
-                    <Image
-                      src={image.path}
-                      alt={image.filename}
-                      fill
-                      sizes="12px"
-                      className="object-cover rounded"
-                    />
-                  </div>
-                  <h3 className="font-semibold truncate">{image.filename.split('.')[0]}</h3>
-                </button>
-              ))}
+      <div className="flex items-center">
+        <div className="flex-1 space-y-4 mr-4">
+          {data.images.map((image) => (
+            <button key={image.filename} className="w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer" onClick={() => setSelectedImage(image)}>
+              <div className="relative w-12 h-12 mr-2">
+                <Image
+                  src={image.path}
+                  alt={image.filename}
+                  fill
+                  sizes="12px"
+                  className="object-cover rounded"
+                />
+              </div>
+              <h3 className="font-semibold truncate">{image.filename.split('.')[0]}</h3>
+            </button>
+          ))}
+        </div>
+        <div className="flex-1 mt-4 w-full h-full border rounded p-4">
+          {selectedImage ?
+            <div className="relative w-full h-[400px]">
+              <Image
+                src={selectedImage.path}
+                alt={selectedImage.filename}
+                fill
+                sizes="100%"
+                className="object-contain"
+              />
             </div>
-            <div className="flex-1 mt-4 w-full h-full border rounded p-4">
-              {selectedImage ?
-                <div className="relative w-full h-[400px]">
-                  <Image
-                    src={selectedImage.path}
-                    alt={selectedImage.filename}
-                    fill
-                    sizes="100%"
-                    className="object-contain"
-                  />
-                </div>
-              : <span className="text-gray-500 text-center">Select an image</span>}
-            </div>
-          </div>
+          : <span className="text-gray-500 text-center">Select an image</span>}
+        </div>
+      </div>
 
-          <div className="mt-4">
-            <Pagination
-              currentPage={page}
-              totalItems={data?.total ?? 0}
-              pageSize={PAGE_SIZE}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        </>
-      )}
+      <div className="mt-4">
+        <Pagination
+          currentPage={page}
+          totalItems={data.total}
+          pageSize={PAGE_SIZE}
+          onPageChange={handlePageChange}
+        />
+      </div>
     </div>
   );
 };
