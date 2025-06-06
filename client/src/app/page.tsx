@@ -28,7 +28,11 @@ export default function Home() {
       {data?.datasets && (
         <ul className="mt-4 space-y-2">
           {data.datasets.map((dataset) => (
-            <Link key={dataset.id} href={`/datasets/${dataset.id}`} className="p-4 bg-gray-800 text-white rounded block hover:bg-gray-700">
+            <Link 
+              key={dataset.id} 
+              href={`/datasets/${dataset.id}`} 
+              className="p-4 bg-gray-800 text-white rounded block hover:bg-gray-700"
+            >
               <span>{dataset.name}</span>
             </Link>
           ))}

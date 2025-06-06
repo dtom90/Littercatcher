@@ -1,8 +1,8 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Literal
 from pydantic import BaseModel
 
 class SplitCounts(BaseModel):
@@ -23,6 +23,17 @@ class DatasetListItem(BaseModel):
 
 class DatasetsResponse(BaseModel):
     datasets: List[DatasetListItem]
+
+class ImageItem(BaseModel):
+    filename: str
+    path: str
+
+class ImagesResponse(BaseModel):
+    images: List[ImageItem]
+    total: int
+    page: int
+    page_size: int
+    has_more: bool
 
 app = FastAPI(
     title="Slobcatcher API",
@@ -104,3 +115,56 @@ async def get_dataset(dataset_id: int):
         "imageCount": image_count,
         "splitCounts": split_counts,
     }
+
+@app.get("/datasets/{dataset_id}/images", response_model=ImagesResponse)
+async def get_dataset_images(
+    dataset_id: int,
+    split: Literal["train", "valid", "test"] = Query(..., description="Dataset split to get images from"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Number of images per page")
+):
+    datasets_dir = os.path.join(os.path.dirname(__file__), "..", "datasets")
+    if not os.path.exists(datasets_dir):
+        raise HTTPException(status_code=404, detail="Datasets directory not found")
+    
+    dataset_names = [name for name in os.listdir(datasets_dir) 
+                    if os.path.isdir(os.path.join(datasets_dir, name))]
+    
+    if dataset_id < 0 or dataset_id >= len(dataset_names):
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    
+    dataset_name = dataset_names[dataset_id]
+    split_path = os.path.join(datasets_dir, dataset_name, split)
+    
+    if not os.path.exists(split_path):
+        raise HTTPException(status_code=404, detail=f"Split '{split}' not found in dataset")
+    
+    # Get all image files
+    image_files = [f for f in os.listdir(split_path) 
+                  if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    
+    # Calculate pagination
+    total_images = len(image_files)
+    start_idx = (page - 1) * page_size
+    end_idx = start_idx + page_size
+    
+    # Get paginated images
+    paginated_images = image_files[start_idx:end_idx]
+    
+    # Create response
+    images = [
+        ImageItem(
+            filename=filename,
+            path=f"/datasets/{dataset_name}/{split}/{filename}"
+        )
+        for filename in paginated_images
+    ]
+    
+    return ImagesResponse(
+        images=images,
+        total=total_images,
+        page=page,
+        page_size=page_size,
+        has_more=end_idx < total_images
+    )
+

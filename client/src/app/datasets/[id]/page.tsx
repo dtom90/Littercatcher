@@ -1,8 +1,11 @@
 'use client';
 
+import DatasetImages from '@/app/components/DatasetImages';
+import { DatasetSplit, DatasetSplitType } from '@/app/types';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
 // Define the Dataset type based on expected API response
 interface Dataset {
@@ -20,6 +23,7 @@ interface Dataset {
 export default function DatasetPage() {
   const params = useParams();
   const datasetId = params.id as string;
+  const [split, setSplit] = useState<DatasetSplitType>(DatasetSplit.Train);
 
   const { data: dataset, isLoading, error } = useQuery<Dataset>({
     queryKey: ['dataset', datasetId],
@@ -68,15 +72,36 @@ export default function DatasetPage() {
               
               {dataset.splitCounts && (
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-gray-700 p-4 rounded-lg">
+                  <div 
+                    onClick={() => setSplit(DatasetSplit.Train)}
+                    className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                      split === DatasetSplit.Train 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
+                  >
                     <h3 className="font-medium text-gray-200">Training</h3>
                     <p className="text-2xl font-bold text-blue-400">{dataset.splitCounts.train}</p>
                   </div>
-                  <div className="bg-gray-700 p-4 rounded-lg">
+                  <div 
+                    onClick={() => setSplit(DatasetSplit.Valid)}
+                    className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                      split === DatasetSplit.Valid 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
+                  >
                     <h3 className="font-medium text-gray-200">Validation</h3>
                     <p className="text-2xl font-bold text-yellow-400">{dataset.splitCounts.valid}</p>
                   </div>
-                  <div className="bg-gray-700 p-4 rounded-lg">
+                  <div 
+                    onClick={() => setSplit(DatasetSplit.Test)}
+                    className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                      split === DatasetSplit.Test 
+                        ? 'bg-blue-600 hover:bg-blue-700' 
+                        : 'bg-gray-700 hover:bg-gray-600'
+                    }`}
+                  >
                     <h3 className="font-medium text-gray-200">Testing</h3>
                     <p className="text-2xl font-bold text-green-400">{dataset.splitCounts.test}</p>
                   </div>
@@ -85,6 +110,8 @@ export default function DatasetPage() {
             </div>
           )}
         </div>
+
+        <DatasetImages datasetId={Number(datasetId)} split={split} />
       </div>
     </div>
   );
