@@ -6,6 +6,7 @@ This is the FastAPI backend for the Slobcatcher application.
 
 1. Create a virtual environment (recommended):
 ```bash
+pyenv local
 python -m venv venv
 source venv/bin/activate  # On Windows, use: venv\Scripts\activate
 ```
