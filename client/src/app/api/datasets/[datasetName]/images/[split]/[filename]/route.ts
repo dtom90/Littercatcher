@@ -4,7 +4,7 @@ import path from 'path';
 
 export async function GET(
   request: Request,
-  { params }: { params: { datasetName: string; split: string; filename: string } }
+  { params }: { params: Promise<{ datasetName: string; split: string; filename: string }> }
 ) {
   try {
     console.log('Route handler called');
@@ -12,7 +12,7 @@ export async function GET(
     console.log('Params type:', typeof params);
     console.log('Request URL:', request.url);
     
-    const { datasetName, split, filename } = params;
+    const { datasetName, split, filename } = await params;
     
     // Construct the path to the image file
     const imagePath = path.join(process.cwd(), '..', 'datasets', datasetName, split, filename);
