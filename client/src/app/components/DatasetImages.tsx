@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { DatasetSplitType, ImagesResponse } from '../types';
+import { DatasetSplitType, ImageItem, ImagesResponse } from '../types';
 import Pagination from './Pagination';
 
 interface DatasetImagesProps {
@@ -12,7 +12,7 @@ interface DatasetImagesProps {
   split: DatasetSplitType;
 }
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page: number) => {
   const response = await fetch(
@@ -28,6 +28,7 @@ const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page:
 
 const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) => {
   const [page, setPage] = useState(1);
+  const [selectedImage, setSelectedImage] = useState<ImageItem | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['datasetImages', datasetId, split, page],
@@ -36,10 +37,12 @@ const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) =>
 
   useEffect(() => {
     setPage(1); // Reset to first page when split changes
+    setSelectedImage(null);
   }, [datasetId, split]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+    setSelectedImage(null);
   };
 
   if (error) {
@@ -52,21 +55,36 @@ const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) =>
         <div>Loading...</div>
       ) : (
         <>
-          <div className="space-y-4">
-            {data?.images.map((image) => (
-              <div key={image.filename} className="border rounded p-4 flex items-center">
-                <div className="relative w-12 h-12 mr-2">
+          <div className="flex items-center">
+            <div className="flex-1 space-y-4 mr-4">
+              {data?.images.map((image) => (
+                <button key={image.filename} className="w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer" onClick={() => setSelectedImage(image)}>
+                  <div className="relative w-12 h-12 mr-2">
+                    <Image
+                      src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(image.filename)}`}
+                      alt={image.filename}
+                      fill
+                      sizes="12px"
+                      className="object-cover rounded"
+                    />
+                  </div>
+                  <h3 className="font-semibold truncate">{image.filename.split('.')[0]}</h3>
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 mt-4 w-full h-full border rounded p-4">
+              {selectedImage ?
+                <div className="relative w-full h-[400px]">
                   <Image
-                    src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(image.filename)}`}
-                    alt={image.filename}
+                    src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(selectedImage.filename)}`}
+                    alt={selectedImage.filename}
                     fill
-                    sizes="12px"
-                    className="object-cover rounded"
+                    sizes="100%"
+                    className="object-contain"
                   />
                 </div>
-                <h3 className="font-semibold truncate">{image.filename.split('.')[0]}</h3>
-              </div>
-            ))}
+              : <span className="text-gray-500 text-center">Select an image</span>}
+            </div>
           </div>
 
           <div className="mt-4">
