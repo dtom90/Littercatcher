@@ -50,22 +50,30 @@ export default function DatasetPage() {
     );
   }
 
+  if (!dataset) {
+    return (
+      <div className="min-h-screen p-8">
+        <p>Dataset not found.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <Link href="/" className="text-gray-300 hover:text-white mb-4 block">← Back to datasets</Link>
 
-        <h1 className="text-4xl font-bold mb-6">{dataset?.name}</h1>
+        <h1 className="text-4xl font-bold mb-6">{dataset.name}</h1>
         
         <div className="bg-gray-800 rounded-lg p-6 space-y-4">
-          {dataset?.description && (
+          {dataset.description && (
             <div>
               <h2 className="text-xl font-semibold mb-2">Description</h2>
               <p className="text-gray-300">{dataset.description}</p>
             </div>
           )}
           
-          {dataset?.imageCount !== undefined && (
+          {dataset.imageCount !== undefined && (
             <div>
               <h2 className="text-xl font-semibold mb-2">Images</h2>
               <p className="text-gray-300 mb-4">{dataset.imageCount} total images</p>
@@ -111,7 +119,7 @@ export default function DatasetPage() {
           )}
         </div>
 
-        <DatasetImages datasetId={Number(datasetId)} split={split} />
+        <DatasetImages datasetId={Number(datasetId)} datasetName={dataset.name} split={split} />
       </div>
     </div>
   );

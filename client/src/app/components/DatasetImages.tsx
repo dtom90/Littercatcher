@@ -2,15 +2,17 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { DatasetSplitType, ImagesResponse } from '../types';
 import Pagination from './Pagination';
 
 interface DatasetImagesProps {
   datasetId: number;
+  datasetName: string;
   split: DatasetSplitType;
 }
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10;
 
 const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page: number) => {
   const response = await fetch(
@@ -24,7 +26,7 @@ const fetchImagesData = async (datasetId: number, split: DatasetSplitType, page:
   return response.json() as Promise<ImagesResponse>;
 };
 
-const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
+const DatasetImages = ({ datasetId, datasetName, split }: DatasetImagesProps) => {
   const [page, setPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
@@ -50,11 +52,19 @@ const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
         <div>Loading...</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="space-y-4">
             {data?.images.map((image) => (
-              <div key={image.filename} className="border rounded p-4">
-                <h3 className="font-semibold truncate">{image.filename}</h3>
-                <p className="text-sm text-gray-600 truncate">{image.path}</p>
+              <div key={image.filename} className="border rounded p-4 flex items-center">
+                <div className="relative w-12 h-12 mr-2">
+                  <Image
+                    src={`/api/datasets/${encodeURIComponent(datasetName)}/images/${split}/${encodeURIComponent(image.filename)}`}
+                    alt={image.filename}
+                    fill
+                    sizes="12px"
+                    className="object-cover rounded"
+                  />
+                </div>
+                <h3 className="font-semibold truncate">{image.filename.split('.')[0]}</h3>
               </div>
             ))}
           </div>
