@@ -1,7 +1,7 @@
 import path from "path";
 import { promises as fs } from 'fs';
 import yaml from 'js-yaml';
-import { parseCOCOFile, COCODataset } from './utils/coco';
+import { parseCOCOFile, ParsedCOCO } from './utils/coco';
 
 export const datasetBasePath = path.join(process.cwd(), 'public', 'images', 'datasets');
 
@@ -29,9 +29,9 @@ enum Split {
 }
 
 interface SplitDataset {
-  [Split.TRAIN]: COCODataset;
-  [Split.VALID]: COCODataset;
-  [Split.TEST]: COCODataset;
+  [Split.TRAIN]: ParsedCOCO;
+  [Split.VALID]: ParsedCOCO;
+  [Split.TEST]: ParsedCOCO;
 }
 
 const datasetAnnotations = new Map<number, SplitDataset>();
@@ -47,6 +47,3 @@ for (const dataset of datasets.datasets) {
 export async function getDatasetAnnotations(datasetId: number, split: Split) {
   return datasetAnnotations.get(datasetId)?.[split];
 }
-
-const testData = await getDatasetAnnotations(1, Split.TEST);
-await fs.writeFile('dataset-test.json', JSON.stringify(testData, null, 2));

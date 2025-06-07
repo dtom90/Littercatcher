@@ -35,6 +35,7 @@ export interface COCOImage {
   extra?: {
     name: string;
   };
+  annotations?: COCOAnnotation[];
 }
 
 export interface COCOCategory {
@@ -50,21 +51,34 @@ export interface COCODataset {
   categories: COCOCategory[];
 }
 
+export interface ParsedCOCO {
+  info: COCOInfo;
+  licenses: COCOLicense[];
+  imagesMap: Map<number, COCOImage>;
+}
+
 /**
  * Parses a COCO format JSON file and returns a structured representation
  * @param filePath Path to the COCO JSON file
  * @returns Structured representation of the COCO dataset
  */
-export async function parseCOCOFile(filePath: string): Promise<COCODataset> {
+export async function parseCOCOFile(filePath: string): Promise<ParsedCOCO> {
   const jsonData: COCODataset = JSON.parse(
     await fs.readFile(filePath, 'utf-8')
   );
 
+  const imagesMap = new Map<number, COCOImage>();
+  jsonData.images.forEach(image => {
+    imagesMap.set(image.id, image);
+  });
+
+  jsonData.annotations.forEach(annotation => {
+    imagesMap.get(annotation.image_id)?.annotations?.push(annotation);
+  });
+
   return {
     info: jsonData.info,
     licenses: jsonData.licenses,
-    images: jsonData.images,
-    annotations: jsonData.annotations,
-    categories: jsonData.categories
+    imagesMap,
   };
 }
