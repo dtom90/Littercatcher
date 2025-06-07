@@ -1,12 +1,27 @@
 import { promises as fs } from 'fs';
 
+export interface COCOInfo {
+  year: string;
+  version: string;
+  description: string;
+  contributor: string;
+  url: string;
+  date_created: string;
+}
+
+export interface COCOLicense {
+  id: number;
+  url: string;
+  name: string;
+}
+
 export interface COCOAnnotation {
   id: number;
   image_id: number;
   category_id: number;
-  segmentation: number[][];
+  bbox: number[]; // [x, y, width, height]
   area: number;
-  bbox: [number, number, number, number]; // [x, y, width, height]
+  segmentation: number[][] | []; // Can be empty array or array of polygon points
   iscrowd: number;
 }
 
@@ -17,24 +32,22 @@ export interface COCOImage {
   file_name: string;
   license: number;
   date_captured: string;
+  extra?: {
+    name: string;
+  };
 }
 
 export interface COCOCategory {
   id: number;
   name: string;
-  supercategory: string;
 }
 
 export interface COCODataset {
+  info: COCOInfo;
+  licenses: COCOLicense[];
   images: COCOImage[];
   annotations: COCOAnnotation[];
   categories: COCOCategory[];
-}
-
-export interface ParsedCOCO {
-  annotationsByImage: Map<number, COCOAnnotation[]>;
-  categoryMap: Map<number, COCOCategory>;
-  images: COCOImage[];
 }
 
 /**
@@ -42,26 +55,16 @@ export interface ParsedCOCO {
  * @param filePath Path to the COCO JSON file
  * @returns Structured representation of the COCO dataset
  */
-export async function parseCOCOFile(filePath: string): Promise<ParsedCOCO> {
+export async function parseCOCOFile(filePath: string): Promise<COCODataset> {
   const jsonData: COCODataset = JSON.parse(
     await fs.readFile(filePath, 'utf-8')
   );
 
-  const annotationsByImage = new Map<number, COCOAnnotation[]>();
-  jsonData.annotations.forEach(annotation => {
-    const imageAnnotations = annotationsByImage.get(annotation.image_id) || [];
-    imageAnnotations.push(annotation);
-    annotationsByImage.set(annotation.image_id, imageAnnotations);
-  });
-
-  const categoryMap = new Map<number, COCOCategory>();
-  jsonData.categories.forEach(category => {
-    categoryMap.set(category.id, category);
-  });
-
   return {
-    annotationsByImage,
-    categoryMap,
-    images: jsonData.images
+    info: jsonData.info,
+    licenses: jsonData.licenses,
+    images: jsonData.images,
+    annotations: jsonData.annotations,
+    categories: jsonData.categories
   };
 }
