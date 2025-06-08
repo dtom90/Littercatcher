@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { COCOAnnotation, COCOCategory } from '../utils/coco';
+import { COCOAnnotation, COCOCategory } from '@/app/api/utils/coco';
 
 interface AnnotatedImageProps {
   src: string;
