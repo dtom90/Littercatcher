@@ -1,12 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import DatasetDetails from '../../components/DatasetDetails';
-import DatasetImages from '../../components/DatasetImages';
-import Link from 'next/link';
 import { useState } from 'react';
-import { DatasetSplit } from '../../components/DatasetDetails';
 import { useParams } from 'next/navigation';
+import BackButton from '@/app/components/BackButton';
+import DatasetDetails, { DatasetSplit } from '@/app/components/DatasetDetails';
+import DatasetImages from '@/app/components/DatasetImages';
 
 export default function DatasetPage() {
   const { id } = useParams();
@@ -28,7 +27,7 @@ export default function DatasetPage() {
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
-        <Link href="/" className="text-gray-300 hover:text-white mb-4 block">← Back to datasets</Link>
+        <BackButton />
         <DatasetDetails dataset={dataset} onSplitChange={setSplit} />
         <DatasetImages datasetId={datasetId} split={split} />
       </div>

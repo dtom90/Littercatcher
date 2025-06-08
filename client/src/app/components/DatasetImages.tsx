@@ -61,7 +61,11 @@ const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
       <div className="flex items-center">
         <div className="flex-1 space-y-4 mr-4">
           {data.images.map((image) => (
-            <button key={image.filename} className="w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer" onClick={() => setSelectedImage(image)}>
+            <button 
+              key={image.filename} 
+              className={`w-full border rounded p-4 flex items-center hover:bg-gray-600 cursor-pointer 
+                ${selectedImage?.filename == image.filename ? " bg-blue-500" : ""}`}
+              onClick={() => setSelectedImage(image)}>
               <div className="relative w-12 h-12 mr-2">
                 <Image
                   src={image.path}
@@ -75,7 +79,7 @@ const DatasetImages = ({ datasetId, split }: DatasetImagesProps) => {
             </button>
           ))}
         </div>
-        <div className="flex-1 mt-4 w-full h-full border rounded p-4">
+        <div className="flex-1 w-full h-full border rounded p-4">
           {selectedImage ?
             <div className="relative w-full h-[400px]">
               <Image
