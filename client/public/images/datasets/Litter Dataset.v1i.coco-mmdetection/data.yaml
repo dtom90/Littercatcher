@@ -1,0 +1,8 @@
+path: /Users/david/dev/Littercatcher/client/public/images/datasets/Litter Dataset.v1i.coco-mmdetection
+train: train
+val: valid
+test: test
+
+# Classes
+names:
+  0: litter
